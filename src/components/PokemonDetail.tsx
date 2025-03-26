@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface Pokemon {
     name: string;
@@ -7,6 +8,7 @@ interface Pokemon {
     height: number;
     weight: number;
     types: string[];
+    stats: { name: string; value: number }[];
 }
 
 interface PokemonDetailProps {
@@ -20,8 +22,6 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-
-
     useEffect(() => {
         const fetchPokemonDetail = async () => {
             try {
@@ -33,12 +33,14 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
                 setPokemon({
                     name: data.name,
                     image: data.sprites.front_default,
-                    height: (data.height / 10),
-                    weight: (data.weight / 10),
+                    height: data.height / 10,
+                    weight: data.weight / 10,
                     types: data.types.map((t: any) => t.type.name),
+                    stats: data.stats.map((s: any) => ({
+                        name: s.stat.name,
+                        value: s.base_stat
+                    })),
                 });
-
-
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -55,14 +57,13 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
     const isFavorite = favorites.includes(pokemon?.name || "");
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-gray-900 flex items-center justify-between p-14 px-40">
             <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-96 text-center border-2 border-gray-600">
                 <h1 className="text-2xl font-bold mb-4">{pokemon?.name}</h1>
                 <img src={pokemon?.image} alt={pokemon?.name} className="mx-auto w-40 h-40 mb-4" />
                 <p className="text-lg"><strong>Height:</strong> {pokemon?.height} M</p>
                 <p className="text-lg"><strong>Weight:</strong> {pokemon?.weight} KG</p>
                 <p className="text-lg"><strong>Types:</strong> {pokemon?.types.join(", ")}</p>
-
                 <div className="flex items-center justify-between w-full">
                     <button
                         onClick={() => toggleFavorite(pokemon?.name || "")}
@@ -76,8 +77,20 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
                     </Link>
                 </div>
             </div>
+            <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg text-center border-2 h-96 border-gray-600 w-1/2">
+                <h2 className="text-xl font-bold mb-4">Stats</h2>
+                <ResponsiveContainer width="100%" height="80%">
+                    <BarChart data={pokemon?.stats}>
+                        <XAxis dataKey="name" stroke="#ffffff" />
+                        <YAxis stroke="#ffffff" />
+                        <Tooltip />
+                        <Bar dataKey="value" fill="#38bdf8" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     );
 };
 
 export default PokemonDetail;
+
