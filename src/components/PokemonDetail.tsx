@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 interface Pokemon {
     name: string;
@@ -83,7 +83,6 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
                     <BarChart data={pokemon?.stats}>
                         <XAxis dataKey="name" stroke="#ffffff" />
                         <YAxis stroke="#ffffff" />
-                        <Tooltip />
                         <Bar dataKey="value" fill="#38bdf8" />
                     </BarChart>
                 </ResponsiveContainer>
@@ -93,4 +92,3 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
 };
 
 export default PokemonDetail;
-
