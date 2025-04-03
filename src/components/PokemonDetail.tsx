@@ -26,9 +26,6 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
         const fetchPokemonDetail = async () => {
             try {
                 const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-                if (!response.ok) {
-                    throw new Error("Pokémon not found");
-                }
                 const data = await response.json();
                 setPokemon({
                     name: data.name,
@@ -77,9 +74,9 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({ favorites, toggleFavorite
                     </Link>
                 </div>
             </div>
-            <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg text-center border-2 h-96 border-gray-600 w-1/2">
+            <div className="bg-gray-800 text-white p-2 rounded-lg shadow-lg text-center border-2 h-96 border-gray-600 w-[800px]">
                 <h2 className="text-xl font-bold mb-4">Stats</h2>
-                <ResponsiveContainer width="100%" height="80%">
+                <ResponsiveContainer width="100%" height="90%">
                     <BarChart data={pokemon?.stats}>
                         <XAxis dataKey="name" stroke="#ffffff" />
                         <YAxis stroke="#ffffff" />
