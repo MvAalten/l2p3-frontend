@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import SearchBar from './SearchBar';
+import Header from './Header';
+import Footer from './Footer';
 
 interface Pokemon {
     name: string;
@@ -9,7 +12,7 @@ interface Pokemon {
 
 interface HomePageProps {
     favorites: string[];
-    toggleFavorite: (pokemon: string) => void;
+    toggleFavorite: (name: string) => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ favorites, toggleFavorite }) => {
@@ -27,6 +30,7 @@ const HomePage: React.FC<HomePageProps> = ({ favorites, toggleFavorite }) => {
                     data.results.map(async (pokemon: { name: string; url: string }) => {
                         const pokemonResponse = await fetch(pokemon.url);
                         const pokemonData = await pokemonResponse.json();
+
                         return {
                             name: pokemon.name,
                             image: pokemonData.sprites.front_default,
@@ -36,11 +40,10 @@ const HomePage: React.FC<HomePageProps> = ({ favorites, toggleFavorite }) => {
                 );
 
                 setPokemons(pokemonDetails);
-                // Collect all types across the fetched Pokémon
                 const allTypes = pokemonDetails.flatMap(pokemon => pokemon.types);
                 setAllPokemonTypes(allTypes);
             } catch (error) {
-                console.error('Error fetching Pokémon data:', error);
+                console.error('Pokemon data not fetched', error);
             }
         };
 
@@ -51,29 +54,13 @@ const HomePage: React.FC<HomePageProps> = ({ favorites, toggleFavorite }) => {
         pokemon.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const typeCounts = allPokemonTypes.reduce((acc, type) => {
-        acc[type] = (acc[type] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-
-    const totalTypes = allPokemonTypes.length;
-
-    const typePercentages = Object.entries(typeCounts).map(([type, count]) => ({
-        name: type,
-        value: (count / totalTypes) * 100,
-    }));
-
     return (
         <div className="p-6">
-            <h1 className="text-4xl font-bold text-center text-white mb-6">Pokémon List</h1>
-            <input
-                type="text"
-                placeholder="Search a Pokémon"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="mb-6 w-full p-3 bg-gray-800 text-white rounded-md"
-            />
+            <Header />
 
+            <SearchBar value={search} onChange={setSearch} />
+
+            {/* Pokémon grid list */}
             <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {filteredPokemons.map((pokemon) => (
                     <li key={pokemon.name} className="bg-gray-800 p-4 rounded-lg shadow-lg">
@@ -81,7 +68,9 @@ const HomePage: React.FC<HomePageProps> = ({ favorites, toggleFavorite }) => {
                         <h3 className="text-xl font-semibold text-center text-white">{pokemon.name}</h3>
                         <button
                             onClick={() => toggleFavorite(pokemon.name)}
-                            className={`mt-4 w-full py-2 rounded-md text-white ${favorites.includes(pokemon.name) ? 'bg-red-500' : 'bg-gray-600'} hover:bg-gray-700`}
+                            className={`mt-4 w-full py-2 rounded-md text-white ${
+                                favorites.includes(pokemon.name) ? 'bg-red-500' : 'bg-gray-600'
+                            } hover:bg-gray-700`}
                         >
                             {favorites.includes(pokemon.name) ? 'Unfavorite' : 'Favorite'}
                         </button>
@@ -94,6 +83,8 @@ const HomePage: React.FC<HomePageProps> = ({ favorites, toggleFavorite }) => {
                     </li>
                 ))}
             </ul>
+
+            <Footer />
         </div>
     );
 };
